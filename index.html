@@ -279,12 +279,18 @@ function nfoSym(expDate, strike, type){
   return `NIFTY${dd}${mon}${yy}${Math.round(strike)}${type}`;
 }
 function lastTuesdayOf(y,m){ const last=new Date(y,m+1,0); const dow=last.getDay(); const diff=(dow>=2)?dow-2:dow+5; return new Date(y,m,last.getDate()-diff); }
+/* Local-date formatter — NEVER use toISOString() for this: it converts to UTC, which
+   silently shifts the date back a day for any positive-offset timezone like IST. */
+function localDateStr(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function getUpcomingExpiries(count){
   const out=[]; const now=new Date(); let d=new Date(now); d.setHours(0,0,0,0);
   while(d.getDay()!==2) d.setDate(d.getDate()+1);
   const todayIsExp = d.toDateString()===now.toDateString();
   if(todayIsExp && now.getHours()>=15 && now.getMinutes()>=30) d.setDate(d.getDate()+7);
-  for(let i=0;i<count;i++){ out.push(d.toISOString().slice(0,10)); d=new Date(d); d.setDate(d.getDate()+7); }
+  for(let i=0;i<count;i++){ out.push(localDateStr(d)); d=new Date(d); d.setDate(d.getDate()+7); }
   return out;
 }
 
@@ -654,7 +660,7 @@ async function fetchHistorical(token, interval, from, to, oi){
 function nextTuesdayOnOrAfter(d){
   const x = new Date(d); while(x.getDay()!==2) x.setDate(x.getDate()+1); return x;
 }
-function fmtDate(d){ return d.toISOString().slice(0,10); }
+function fmtDate(d){ return localDateStr(d); }
 
 async function runBacktest(){
   if(!ST.connected){ btLog('Connect first.'); return; }
