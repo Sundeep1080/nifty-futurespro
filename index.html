@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIFTY Signal Tracker — OI S/R Auto Entries</title>
+<title>NIFTY OPTION CHAIN · Greeks · PCR · Max Pain</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -14,25 +14,22 @@
   --amber:#f0a202;--amber-g:rgba(240,162,2,.09);
   --bull:#16a34a;--bull-g:rgba(22,163,74,.10);
   --bear:#ef4444;--bear-g:rgba(239,68,68,.10);
+  --buildL:#22c55e;--buildS:#f59e0b;--buildSC:#38bdf8;--buildU:#a78bfa;
   --mono:'IBM Plex Mono',monospace;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:13px}
 body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh}
-.shell{max-width:1600px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:10px}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(240,162,2,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(240,162,2,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+.shell{max-width:1760px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
 
 .masthead{background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--amber);border-radius:8px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-mark{width:32px;height:32px;background:var(--amber);border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#0b0d12}
-.brand h1{font-size:14px;font-weight:700;letter-spacing:2px;color:var(--bright)}
+.brand h1{font-size:14px;font-weight:700;letter-spacing:2.5px;color:var(--bright)}
 .brand p{font-size:9px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
 .mkt-clock{font-size:10px;color:var(--text2);text-align:right}
 .mkt-clock b{color:var(--bright);font-size:12px}
-
-.mode-banner{border-radius:8px;padding:10px 18px;font-weight:700;font-size:11px;text-align:center;letter-spacing:1px}
-.mode-banner.paper{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.35);color:#38bdf8}
-.mode-banner.live{background:rgba(239,68,68,.14);border:1px solid var(--bear);color:var(--bear);animation:blink 1.4s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
 
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
 .panel-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -41,7 +38,7 @@ body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:1
 .dot.err{background:var(--bear)}
 .dot.busy{background:var(--amber);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .field{display:flex;flex-direction:column;gap:3px}
 .field label{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 input[type=text],input[type=password],input[type=number],select{
@@ -55,42 +52,68 @@ button{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.5p
 button:hover{filter:brightness(1.1)}
 button:disabled{opacity:.4;cursor:not-allowed}
 button.ghost{background:transparent;border-color:var(--border2);color:var(--text)}
-button.danger{background:var(--bear);color:#fff}
-button.small{padding:4px 9px;font-size:9px}
-.log{font-size:8px;color:var(--text3);max-height:70px;overflow-y:auto;background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:4px 7px;flex:1;min-width:220px}
+.log{font-size:8px;color:var(--text3);max-height:46px;overflow-y:auto;background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:4px 7px;flex:1;min-width:220px}
 .help{font-size:8.5px;color:var(--text3);line-height:1.6;margin-top:8px}
+.help b{color:var(--text2)}
 .help code{color:var(--amber);background:var(--panel2);padding:1px 4px;border-radius:3px}
-.checkrow{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--text2)}
-.checkrow input[type=checkbox]{width:14px;height:14px}
+details{margin-top:6px}
+details summary{cursor:pointer;font-size:9px;color:var(--amber);font-weight:700;letter-spacing:.5px;text-transform:uppercase;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'▸ ';}
+details[open] summary::before{content:'▾ ';}
+details .body{font-size:9.5px;color:var(--text2);line-height:1.7;padding:8px 2px 2px;max-width:1000px}
+details .body b{color:var(--bright)}
+details .body ul{margin:4px 0 4px 16px}
 
-.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .sumcell{background:var(--panel);padding:10px 12px}
 .sumcell label{display:block;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
-.sumcell .v{font-size:15px;font-weight:700;color:var(--bright)}
+.sumcell .v{font-size:14px;font-weight:700;color:var(--bright)}
 .sumcell .v.bull{color:var(--bull)}.sumcell .v.bear{color:var(--bear)}.sumcell .v.amber{color:var(--amber)}
+.sumcell .sub{font-size:8px;color:var(--text2);margin-top:2px}
 
-.pos-wrap{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.pos-hdr{padding:8px 16px;border-bottom:1px solid var(--border);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)}
-table{width:100%;border-collapse:collapse;font-size:10px}
-thead th{background:var(--panel2);color:var(--text2);font-weight:700;font-size:8px;text-transform:uppercase;padding:7px 8px;border-bottom:1px solid var(--border2);text-align:left}
-tbody td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
-tbody tr.closed{opacity:.5}
-.exit-line{display:block;font-size:9px;color:var(--text2)}
-.exit-line b{color:var(--bright)}
-.tgt-btns{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-.empty-state{padding:30px;text-align:center;color:var(--text3);font-size:11px}
+.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+
+.chart-box{height:230px;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.chart-box.small{height:120px}
+.chart-legend{display:flex;gap:14px;font-size:8.5px;color:var(--text2);margin:6px 2px 8px}
+.chart-legend span{display:flex;align-items:center;gap:5px}
+.chart-legend i{width:12px;height:2px;display:inline-block}
+
+table.mini{width:100%;border-collapse:collapse;font-size:9.5px}
+table.mini th{text-align:left;color:var(--text3);font-size:8px;text-transform:uppercase;padding:4px 6px;border-bottom:1px solid var(--border)}
+table.mini td{padding:4px 6px;border-bottom:1px solid var(--border);color:var(--text)}
+.pattern-tag{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--amber-g);color:var(--amber)}
+
+.chain-wrap{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.chain-hdr{padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.chain-hdr .lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto;font-size:8px;color:var(--text2)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--panel2);color:var(--text2);font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;border-bottom:1px solid var(--border2);text-align:center}
+th.call-group{color:var(--bull)}th.put-group{color:var(--bear)}
+tbody td{padding:5px 8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text)}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+tbody tr.atm td{background:var(--amber-g);border-top:1px solid var(--amber);border-bottom:1px solid var(--amber)}
+tbody tr.sup td.strike{box-shadow:inset 3px 0 0 var(--bull)}
+tbody tr.res td.strike{box-shadow:inset 3px 0 0 var(--bear)}
+td.strike{font-weight:700;color:var(--bright);background:var(--panel2);border-left:2px solid var(--border2);border-right:2px solid var(--border2)}
+tr.atm td.strike{color:var(--amber);border-left-color:var(--amber);border-right-color:var(--amber)}
+.oi-bar{height:3px;border-radius:2px;margin-top:3px}
+.oi-bar.c{background:var(--bull)}.oi-bar.p{background:var(--bear)}
+.tag{font-size:7px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.3px}
+.tag-LB{background:rgba(34,197,94,.14);color:var(--buildL)}
+.tag-SB{background:rgba(245,158,11,.14);color:var(--buildS)}
+.tag-SC{background:rgba(56,189,248,.14);color:var(--buildSC)}
+.tag-LU{background:rgba(167,139,250,.14);color:var(--buildU)}
+.tag-flat{background:var(--panel2);color:var(--text3)}
+.empty-state{padding:40px 20px;text-align:center;color:var(--text3);font-size:11px}
 footer{text-align:center;font-size:8.5px;color:var(--text3);padding:6px 0 0;line-height:1.6}
-
-.chart-box{height:220px;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:10px}
-.stat-cell{background:var(--panel);padding:9px 11px}
-.stat-cell label{display:block;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
-.stat-cell .v{font-size:14px;font-weight:700;color:var(--bright)}
-.stat-cell .v.bull{color:var(--bull)}.stat-cell .v.bear{color:var(--bear)}
-.progress-wrap{background:var(--panel2);border:1px solid var(--border);border-radius:4px;height:14px;overflow:hidden;margin-top:8px}
-.progress-bar{height:100%;background:var(--amber);width:0%;transition:width .2s}
-.bt-note{font-size:8.5px;color:var(--text3);line-height:1.6;margin-top:8px}
-.bt-note b{color:var(--text2)}
+.alert-fired{font-size:9px;background:rgba(240,162,2,.1);border:1px solid rgba(240,162,2,.3);color:var(--amber);padding:6px 10px;border-radius:4px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -98,755 +121,665 @@ footer{text-align:center;font-size:8.5px;color:var(--text3);padding:6px 0 0;line
 
   <div class="masthead">
     <div class="brand">
-      <div class="brand-mark">ST</div>
-      <div><h1>NIFTY SIGNAL TRACKER</h1><p>OI Support/Resistance → Auto Entry → 4-Target Scaled Exit</p></div>
+      <div class="brand-mark">NC</div>
+      <div><h1>NIFTY OPTION CHAIN</h1><p>Live OI · IV · Greeks · PCR · Max Pain · Gann</p></div>
     </div>
     <div class="mkt-clock"><div id="clockDate">—</div><b id="clockTime">--:--:--</b></div>
   </div>
-
-  <div class="mode-banner paper" id="modeBanner">PAPER MODE — no real orders will be placed</div>
 
   <!-- ══ CONNECTION ══ -->
   <div class="panel">
     <div class="panel-title"><span class="dot" id="kDot"></span> KITE CONNECT SESSION</div>
     <div class="row">
-      <div class="field"><label>API Key</label><input type="text" id="kApiKey" placeholder="your_api_key"></div>
-      <div class="field"><label>Access Token</label><input type="password" id="kToken" placeholder="today's access_token"></div>
+      <div class="field"><label>API Key</label><input type="text" id="kApiKey" placeholder="your_api_key" autocomplete="off"></div>
+      <div class="field"><label>Access Token</label><input type="password" id="kToken" placeholder="today's access_token" autocomplete="off"></div>
       <div class="field"><label>Worker Base URL</label><input type="text" id="kWorker" style="width:260px" value="https://jade-kite.sundeep1080.workers.dev"></div>
-      <button onclick="connectKite()">Connect</button>
+      <div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:8px;color:var(--text3)">&nbsp;</label><button id="kConnectBtn" onclick="connectKite()">Connect</button></div>
       <div class="log" id="kLog">Waiting for connection…</div>
     </div>
     <div class="help">
-      Same <code>api_key:access_token</code> + <code>X-Kite-Version:3</code> auth as your TRAM file. Orders POST to
-      <code>/kite/orders/regular</code> — the same path your TRAM already calls for cancels
-      (<code>/kite/orders/regular/{id}</code> DELETE), so the create path should already be proxied.
+      Uses the exact <code>api_key:access_token</code> + <code>/kite/quote</code> pattern already proven in your TRAM file
+      (line ~3154), and the same mathematical tradingsymbol construction from your <code>nfoSym()</code> function
+      (no instruments-dump fetch needed — since NSE now runs weekly Nifty expiries every Tuesday, the day is already
+      baked into every symbol your file builds). Read-only — this page never places orders.
     </div>
   </div>
 
-  <!-- ══ SIGNAL SETTINGS ══ -->
+  <!-- ══ SETTINGS ══ -->
   <div class="panel">
-    <div class="panel-title">SIGNAL SETTINGS</div>
+    <div class="panel-title">CHAIN SETTINGS</div>
     <div class="row">
-      <div class="field"><label>Expiry</label><select id="sExpiry" disabled><option>Connect first</option></select></div>
-      <div class="field"><label>S/R Scan Range (±strikes)</label><input type="number" id="sScanRange" value="15"></div>
-      <div class="field"><label>Touch Zone (pts)</label><input type="number" id="sTouch" value="15"></div>
-      <div class="field"><label>Reversal Confirm (pts)</label><input type="number" id="sConfirm" value="8"></div>
-      <div class="field"><label>Cooldown per level (min)</label><input type="number" id="sCooldown" value="15"></div>
-      <div class="field"><label>Lots per Signal (÷4 targets)</label><input type="number" id="sLots" value="4" min="4" step="4"></div>
-      <div class="field"><label>Lot Size</label><input type="number" id="sLotSize" value="65"></div>
-      <div class="field"><label>Max Concurrent Positions</label><input type="number" id="sMaxPos" value="2"></div>
-      <div class="field"><label>Poll Interval (sec)</label><input type="number" id="sPoll" value="10"></div>
-    </div>
-    <div class="row" style="margin-top:6px">
-      <div class="field"><label>Target 1 / 2 / 3 / 4 (% of entry)</label>
-        <div style="display:flex;gap:4px">
-          <input type="number" id="tg1" value="5" style="width:55px">
-          <input type="number" id="tg2" value="10" style="width:55px">
-          <input type="number" id="tg3" value="15" style="width:55px">
-          <input type="number" id="tg4" value="20" style="width:55px">
-        </div>
+      <div class="field"><label>Expiry</label><select id="sExpiry" style="width:170px" disabled><option>Connect first</option></select></div>
+      <div class="field"><label>Strikes (± ATM)</label><input type="number" id="sRange" value="12" min="4" max="40"></div>
+      <div class="field"><label>Strike Step</label><input type="number" id="sStep" value="50" step="50"></div>
+      <div class="field"><label>Lot Size</label><input type="number" id="sLot" value="65"></div>
+      <div class="field"><label>Risk-Free Rate %</label><input type="number" id="sRate" value="6.5" step="0.1"></div>
+      <div class="field"><label>Auto-Refresh</label>
+        <select id="sRefresh" style="width:100px"><option value="0">Off</option><option value="10">10s</option><option value="15" selected>15s</option><option value="30">30s</option><option value="60">60s</option></select>
       </div>
-      <div class="field"><label>Stop Loss (% of entry)</label><input type="number" id="slPct" value="12"></div>
-      <button id="scanBtn" class="ghost" onclick="toggleScanning()" disabled>Start Scanning</button>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-left:auto"><label style="font-size:8px;color:var(--text3)">&nbsp;</label><button id="loadChainBtn" class="ghost" onclick="loadChain()" disabled>Load Chain</button></div>
     </div>
+
+    <details>
+      <summary>Why Greeks / IV are model estimates, not exchange-quoted values</summary>
+      <div class="body">
+        NSE's live feed only ever carries five fields per contract: <b>LTP, bid/ask, volume, OI, day OHLC</b>. It never carries
+        Delta, Gamma, Theta, Vega or IV — no exchange anywhere publishes those, because a Greek isn't a traded price, it's a
+        <b>partial derivative of a pricing model</b>. There's no model-free "true" Delta sitting in the market; it only exists
+        once you fix a model, a volatility input, and a rate input. That's also why two platforms can legitimately disagree on
+        the same contract at the same second:
+        <ul>
+          <li><b>Forward vs spot</b> — this page prices NIFTY options off the <b>futures price as the forward</b> (Black-76),
+          because the futures price already embeds the market's real cost-of-carry/dividend expectation. Pricing off raw spot
+          with a guessed dividend yield (what most simple tools do) introduces a small, avoidable bias.</li>
+          <li><b>Which price you solve IV from</b> — this page uses the live <b>bid/ask midpoint</b> when available, falling
+          back to LTP only if depth is empty. A stale LTP in a thin strike gives you a stale IV.</li>
+          <li><b>Solver robustness</b> — IV is found numerically (Newton-Raphson), which can fail to converge on deep ITM/OTM
+          strikes near expiry. This page falls back to bisection so a strike doesn't just silently show "—".</li>
+          <li><b>Rate assumption</b> — the risk-free rate above is a manual input, same as every retail platform; none of them
+          are using your exact funding rate either.</li>
+        </ul>
+        Net effect: these Greeks are a reasonable, methodologically sound estimate — not a display bug, and not something any
+        vendor (Spider included) can make "exchange-accurate," because that phrase doesn't apply to a modeled quantity.
+      </div>
+    </details>
   </div>
 
-  <!-- ══ DAY-LEVEL CONTROLS (mirrors your Spider screenshot) ══ -->
+  <!-- ══ SUMMARY STRIP ══ -->
+  <div class="summary" id="summaryStrip">
+    <div class="sumcell"><label>Nifty Spot</label><div class="v" id="sumSpot">—</div><div class="sub" id="sumSpotChg">—</div></div>
+    <div class="sumcell"><label>Futures LTP</label><div class="v" id="sumFut">—</div><div class="sub" id="sumFutPrem">—</div></div>
+    <div class="sumcell"><label>ATM Strike</label><div class="v amber" id="sumAtm">—</div></div>
+    <div class="sumcell"><label>Days to Expiry</label><div class="v" id="sumDte">—</div></div>
+    <div class="sumcell"><label>PCR (OI)</label><div class="v" id="sumPcr">—</div><div class="sub" id="sumPcrTag">—</div></div>
+    <div class="sumcell"><label>Max Pain</label><div class="v amber" id="sumMaxPain">—</div></div>
+    <div class="sumcell"><label>Total Call OI</label><div class="v bull" id="sumCallOi">—</div></div>
+    <div class="sumcell"><label>Total Put OI</label><div class="v bear" id="sumPutOi">—</div></div>
+    <div class="sumcell"><label>ATM IV (avg)</label><div class="v" id="sumIv">—</div></div>
+    <div class="sumcell"><label>Implied Move (Straddle)</label><div class="v" id="sumStraddle">—</div></div>
+    <div class="sumcell"><label>Last Update</label><div class="v" id="sumUpdated" style="font-size:11px">—</div></div>
+  </div>
+
+  <!-- ══ MAX PAIN / SPOT TREND + PCR TREND ══ -->
   <div class="panel">
-    <div class="panel-title">DAY-LEVEL CONTROLS</div>
-    <div class="row">
-      <div class="checkrow"><input type="checkbox" id="ckDayProfit"><label>Exit All OpenPos if Day Profit ≥</label><input type="number" id="dayProfitVal" value="10000" style="width:90px"></div>
-      <div class="checkrow"><input type="checkbox" id="ckDayLoss"><label>Exit All OpenPos if Day Loss ≥</label><input type="number" id="dayLossVal" value="6000" style="width:90px"></div>
-      <div class="checkrow"><input type="checkbox" id="ckBlockLoss"><label>Block new entries if (Booked+M2M) Loss ></label><input type="number" id="blockLossVal" value="4000" style="width:90px"></div>
+    <div class="panel-title">MAX PAIN &amp; SPOT TREND — this session</div>
+    <div class="chart-legend"><span><i style="background:#f0a202"></i>Max Pain</span><span><i style="background:#38bdf8"></i>Spot</span></div>
+    <div class="chart-box" id="maxPainChart"></div>
+    <div class="panel-title" style="margin-top:10px">PCR TREND</div>
+    <div class="chart-box small" id="pcrChart"></div>
+  </div>
+
+  <div class="grid2">
+    <!-- ══ DERIVATIVES SUMMARY ══ -->
+    <div class="panel">
+      <div class="panel-title">DERIVATIVES SUMMARY</div>
+      <table class="mini">
+        <tr><th>Futures Premium</th><td id="dsPrem">—</td><th>PCR (Volume)</th><td id="dsPcrVol">—</td></tr>
+        <tr><th>OI Support (Max Put OI)</th><td id="dsSupport">—</td><th>OI Resistance (Max Call OI)</th><td id="dsResistance">—</td></tr>
+        <tr><th>ATM Straddle Price</th><td id="dsStraddlePx">—</td><th>Implied Move %</th><td id="dsStraddlePct">—</td></tr>
+      </table>
     </div>
-    <div class="row" style="margin-top:8px">
-      <label class="checkrow"><input type="checkbox" id="liveModeToggle" onchange="onLiveToggle()"> <b style="color:var(--bear)">ENABLE LIVE ORDERS</b></label>
-      <input type="text" id="liveConfirmText" placeholder="type LIVE to confirm" style="display:none;width:150px">
-      <button class="danger" onclick="exitAllNow()">EXIT ALL POSITIONS NOW</button>
+
+    <!-- ══ GANN SQUARE OF 9 ══ -->
+    <div class="panel">
+      <div class="panel-title">GANN SQUARE OF 9 — LEVELS FROM SPOT</div>
+      <table class="mini">
+        <thead><tr><th>Resistance ↑</th><th>Support ↓</th></tr></thead>
+        <tbody id="gannBody"><tr><td colspan="2" style="color:var(--text3)">Load chain to compute.</td></tr></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- ══ SUMMARY ══ -->
-  <div class="summary">
-    <div class="sumcell"><label>Nifty Spot</label><div class="v" id="sumSpot">—</div></div>
-    <div class="sumcell"><label>OI Support</label><div class="v bull" id="sumSupport">—</div></div>
-    <div class="sumcell"><label>OI Resistance</label><div class="v bear" id="sumResistance">—</div></div>
-    <div class="sumcell"><label>Open Pos</label><div class="v" id="sumOpenPos">0</div></div>
-    <div class="sumcell"><label>Booked PL</label><div class="v" id="sumBooked">₹0</div></div>
-    <div class="sumcell"><label>M2M PL</label><div class="v" id="sumM2M">₹0</div></div>
-    <div class="sumcell"><label>Day Total</label><div class="v amber" id="sumDayTotal">₹0</div></div>
-    <div class="sumcell"><label>Last Scan</label><div class="v" id="sumLastScan" style="font-size:11px">—</div></div>
-  </div>
-
-  <!-- ══ POSITIONS TABLE ══ -->
-  <div class="pos-wrap">
-    <div class="pos-hdr">Positions</div>
-    <table>
-      <thead><tr><th>Name</th><th>Entry</th><th>Targets</th><th>Exits</th><th>Booked</th><th>M2M</th><th>Actions</th></tr></thead>
-      <tbody id="posBody"><tr><td colspan="7" class="empty-state">Connect, then Start Scanning. Positions will appear here as signals fire.</td></tr></tbody>
-    </table>
-  </div>
-
-  <!-- ══ BACKTEST ══ -->
+  <!-- ══ NIFTY MINI CHART + PATTERNS ══ -->
   <div class="panel">
-    <div class="panel-title">BACKTEST — replays the exact signal settings above against history</div>
+    <div class="panel-title">NIFTY 50 — DAILY, WITH AUTO-TRENDLINE &amp; PATTERN SCAN <span id="niftyPatternTag"></span></div>
+    <div class="chart-box" id="niftyChart"></div>
+  </div>
+
+  <!-- ══ ALERTS ══ -->
+  <div class="panel">
+    <div class="panel-title">ALERTS</div>
     <div class="row">
-      <div class="field"><label>From Date</label><input type="text" id="btFrom" placeholder="YYYY-MM-DD"></div>
-      <div class="field"><label>To Date</label><input type="text" id="btTo" placeholder="YYYY-MM-DD"></div>
-      <button id="btRunBtn" onclick="runBacktest()" disabled>Run Backtest</button>
-      <div class="log" id="btLog">Connect first, then set a date range (last ~30-60 days recommended — NFO historical data has a limited lookback window).</div>
+      <div class="field"><label>PCR above</label><input type="number" id="alPcrHi" value="1.4" step="0.05"></div>
+      <div class="field"><label>PCR below</label><input type="number" id="alPcrLo" value="0.6" step="0.05"></div>
+      <div class="field"><label>Max Pain distance (pts)</label><input type="number" id="alMpDist" value="150" step="10"></div>
+      <div class="field"><label>OI spike % (any strike)</label><input type="number" id="alOiSpike" value="25" step="5"></div>
+      <button class="ghost" onclick="Notification && Notification.requestPermission()">Enable Browser Alerts</button>
     </div>
-    <div class="progress-wrap"><div class="progress-bar" id="btProgress"></div></div>
-    <div class="bt-note">
-      <b>Methodology:</b> Support/Resistance for each day = previous day's closing OI (max Put OI = support, max Call OI = resistance)
-      at that day's ATM ± scan-range strikes. ATM is fixed from the prior day's close. Replay runs on 5-minute NIFTY spot bars using
-      the identical touch-zone/reversal/target/SL parameters set above. Positions unresolved by day-end are closed at that day's last
-      candle ("EOD close"). This is a methodology-limited backtest, not a guarantee of live performance — see notes above each limitation.
-    </div>
+    <div id="alertsFired"></div>
+  </div>
 
-    <div class="stat-grid" id="btStats" style="display:none">
-      <div class="stat-cell"><label>Trading Days</label><div class="v" id="btDays">—</div></div>
-      <div class="stat-cell"><label>Total Trades</label><div class="v" id="btTrades">—</div></div>
-      <div class="stat-cell"><label>Win Rate</label><div class="v" id="btWinRate">—</div></div>
-      <div class="stat-cell"><label>Total P&amp;L</label><div class="v" id="btTotalPL">—</div></div>
-      <div class="stat-cell"><label>Avg P&amp;L / Trade</label><div class="v" id="btAvgPL">—</div></div>
-      <div class="stat-cell"><label>Max Drawdown</label><div class="v bear" id="btMaxDD">—</div></div>
-      <div class="stat-cell"><label>Best Day</label><div class="v bull" id="btBestDay">—</div></div>
-      <div class="stat-cell"><label>Worst Day</label><div class="v bear" id="btWorstDay">—</div></div>
+  <!-- ══ CHAIN TABLE ══ -->
+  <div class="chain-wrap">
+    <div class="chain-hdr">
+      <span class="lbl">Option Chain</span>
+      <div class="legend">
+        <span><i style="background:var(--buildL)"></i>Long Buildup</span>
+        <span><i style="background:var(--buildS)"></i>Short Buildup</span>
+        <span><i style="background:var(--buildSC)"></i>Short Covering</span>
+        <span><i style="background:var(--buildU)"></i>Long Unwinding</span>
+      </div>
     </div>
-    <div class="chart-box" id="btEquityChart" style="margin-top:10px;display:none"></div>
-
-    <div class="table-scroll" style="margin-top:10px">
-      <table id="btLogTable" style="display:none">
-        <thead><tr><th>Date</th><th>Side</th><th>Level</th><th>Entry</th><th>Exits</th><th>Day P&amp;L</th></tr></thead>
-        <tbody id="btTradeBody"></tbody>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th colspan="8" class="call-group">CALLS</th><th>STRIKE</th><th colspan="8" class="put-group">PUTS</th></tr>
+          <tr>
+            <th class="call-group">OI</th><th class="call-group">Chg</th><th class="call-group">Bldup</th><th class="call-group">Vol</th>
+            <th class="call-group">IV%</th><th class="call-group">LTP</th><th class="call-group">Δ</th><th class="call-group">Θ</th>
+            <th></th>
+            <th class="put-group">Θ</th><th class="put-group">Δ</th><th class="put-group">LTP</th><th class="put-group">IV%</th>
+            <th class="put-group">Vol</th><th class="put-group">Bldup</th><th class="put-group">Chg</th><th class="put-group">OI</th>
+          </tr>
+        </thead>
+        <tbody id="chainBody"><tr><td colspan="17" class="empty-state">Connect Kite, pick an expiry, then Load Chain.</td></tr></tbody>
       </table>
     </div>
   </div>
 
   <footer>
-    Paper mode simulates fills against live LTP — it does not guarantee live fills will match. Signal logic (OI support/resistance
-    bounce + reversal confirmation) and the 5/10/15/20% target ladder + 12% stop loss are this build's own design, not a
-    verified replica of Spider's internal algorithm. Test thoroughly in paper mode before enabling live orders. Not financial advice.
+    Read-only analytics. Greeks/IV are Black-76 model estimates using the futures price as forward and the bid/ask midpoint —
+    see "Why Greeks/IV are model estimates" above. Max Pain history and PCR trend are captured only from when you loaded this
+    page this session, not sourced from any historical database. Not financial advice.
   </footer>
 </div>
 
 <script>
 /* ══════════════════════ STATE ══════════════════════ */
 let ST = {
-  apiKey:'', token:'', worker:'', connected:false,
-  selectedExpiry:'', scanning:false, scanTimer:null,
-  levelState:{}, // {support: {armed:bool, cooldownUntil:ts}, resistance:{...}}
-  positions:[],  // {id, side, symbol, strike, entryPx, lots, lotSize, targets[], slPx, filledOrderId, status, exits[], bookedPL}
-  liveMode:false,
-  dayHalted:false
+  apiKey:'', token:'', worker:'',
+  selectedExpiry:'', expiries:[],
+  spotToken:'256265',
+  baseline:{}, refreshTimer:null, connected:false,
+  maxPainHistory:[], pcrHistory:[],
+  alertsFiredKeys:new Set()
 };
+let maxPainChart, mpLine, spotLine, pcrChart, pcrLine, niftyChart, niftyCandles, niftyTrendline;
 
+/* ══════════════════════ CLOCK ══════════════════════ */
 function tickClock(){
-  const n=new Date();
-  document.getElementById('clockDate').textContent=n.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('clockTime').textContent=n.toLocaleTimeString('en-IN',{hour12:false});
+  const n = new Date();
+  document.getElementById('clockDate').textContent = n.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('clockTime').textContent = n.toLocaleTimeString('en-IN',{hour12:false});
 }
 tickClock(); setInterval(tickClock,1000);
 
 function klog(msg){
-  const el=document.getElementById('kLog');
-  const ts=new Date().toLocaleTimeString('en-IN',{hour12:false});
-  el.innerHTML+=`<div>[${ts}] ${msg}</div>`; el.scrollTop=el.scrollHeight;
+  const el = document.getElementById('kLog');
+  const ts = new Date().toLocaleTimeString('en-IN',{hour12:false});
+  el.innerHTML += `<div>[${ts}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
 }
-function setDot(s){ document.getElementById('kDot').className='dot '+s; }
+function setDot(state){ document.getElementById('kDot').className = 'dot '+state; }
 
-/* ══════════════════════ KITE HELPERS ══════════════════════ */
-async function kiteFetch(path, opts={}){
-  const res = await fetch(`${ST.worker}${path}`,{...opts, headers:{'X-Kite-Version':'3','Authorization':`token ${ST.apiKey}:${ST.token}`, ...(opts.headers||{})}});
-  if(!res.ok){ const b=await res.text().catch(()=>''); throw new Error(`HTTP ${res.status} on ${path} — ${b.slice(0,140)}`); }
+/* ══════════════════════ KITE FETCH HELPERS (mirrors TRAM's proven pattern) ══════════════════════ */
+async function kiteFetch(path){
+  const res = await fetch(`${ST.worker}${path}`,{headers:{'X-Kite-Version':'3','Authorization':`token ${ST.apiKey}:${ST.token}`}});
+  if(!res.ok){ const body = await res.text().catch(()=>''); throw new Error(`HTTP ${res.status} on ${path} — ${body.slice(0,140)}`); }
   return res;
 }
+/* Batched quote fetch — chunk size 10, identical convention to TRAM's fetchNFOQuotes */
 async function fetchQuotes(idents){
-  const out={}; const chunks=[]; for(let i=0;i<idents.length;i+=10) chunks.push(idents.slice(i,i+10));
+  const out = {};
+  const chunks = []; for(let i=0;i<idents.length;i+=10) chunks.push(idents.slice(i,i+10));
   for(const chunk of chunks){
     const params = chunk.map(s=>'i='+encodeURIComponent(s)).join('&');
-    const res = await kiteFetch(`/kite/quote?${params}`); const j = await res.json();
+    const res = await kiteFetch(`/kite/quote?${params}`);
+    const j = await res.json();
     if(j.data) Object.assign(out, j.data);
   }
   return out;
 }
 
-/* ══════════════════════ SYMBOL CONSTRUCTION (same convention as TRAM's nfoSym) ══════════════════════ */
-const NFO_MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+/* ══════════════════════ SYMBOL CONSTRUCTION (copied from TRAM's nfoSym/getNiftyExpiries) ══════════════════════ */
+const NFO_MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 function nfoSym(expDate, strike, type){
-  const d=new Date(expDate); const dd=String(d.getDate()).padStart(2,'0'); const mon=NFO_MON[d.getMonth()]; const yy=String(d.getFullYear()).slice(2);
+  const d = new Date(expDate);
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mon = NFO_MON[d.getMonth()];
+  const yy = String(d.getFullYear()).slice(2);
   return `NIFTY${dd}${mon}${yy}${Math.round(strike)}${type}`;
 }
-function lastTuesdayOf(y,m){ const last=new Date(y,m+1,0); const dow=last.getDay(); const diff=(dow>=2)?dow-2:dow+5; return new Date(y,m,last.getDate()-diff); }
+function nfoFutSym(monthDate){
+  const d = new Date(monthDate);
+  const mon = NFO_MON[d.getMonth()];
+  const yy = String(d.getFullYear()).slice(2);
+  return `NIFTY${yy}${mon}FUT`;
+}
+function lastTuesdayOf(y,m){
+  const last = new Date(y, m+1, 0);
+  const dow = last.getDay();
+  const diff = (dow>=2) ? dow-2 : dow+5;
+  return new Date(y, m, last.getDate()-diff);
+}
 /* Local-date formatter — NEVER use toISOString() for this: it converts to UTC, which
    silently shifts the date back a day for any positive-offset timezone like IST. */
 function localDateStr(d){
   const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 }
+/* All upcoming Tuesday expiries (Nifty weekly+monthly both fall on Tuesday since Sep-2025) */
 function getUpcomingExpiries(count){
-  const out=[]; const now=new Date(); let d=new Date(now); d.setHours(0,0,0,0);
-  while(d.getDay()!==2) d.setDate(d.getDate()+1);
-  const todayIsExp = d.toDateString()===now.toDateString();
-  if(todayIsExp && now.getHours()>=15 && now.getMinutes()>=30) d.setDate(d.getDate()+7);
-  for(let i=0;i<count;i++){ out.push(localDateStr(d)); d=new Date(d); d.setDate(d.getDate()+7); }
+  const out = [];
+  const now = new Date();
+  let d = new Date(now); d.setHours(0,0,0,0);
+  while(d.getDay() !== 2) d.setDate(d.getDate()+1); // walk to next Tuesday
+  // if today IS the Tuesday but past 15:30, skip to next week
+  const todayIsExpiry = d.toDateString()===now.toDateString();
+  if(todayIsExpiry && now.getHours()>=15 && now.getMinutes()>=30) d.setDate(d.getDate()+7);
+  for(let i=0;i<count;i++){
+    const dateStr = localDateStr(d);
+    const isMonthly = d.getTime() === lastTuesdayOf(d.getFullYear(), d.getMonth()).getTime();
+    out.push({date:dateStr, isMonthly});
+    d = new Date(d); d.setDate(d.getDate()+7);
+  }
   return out;
+}
+function getCurrentFuturesMonth(){
+  const now = new Date();
+  const thisMonthExp = lastTuesdayOf(now.getFullYear(), now.getMonth());
+  return (now > thisMonthExp) ? new Date(now.getFullYear(), now.getMonth()+1, 1) : new Date(now.getFullYear(), now.getMonth(), 1);
 }
 
 /* ══════════════════════ CONNECT ══════════════════════ */
 async function connectKite(){
-  ST.apiKey=document.getElementById('kApiKey').value.trim();
-  ST.token=document.getElementById('kToken').value.trim();
-  ST.worker=document.getElementById('kWorker').value.trim().replace(/\/$/,'');
-  if(!ST.apiKey||!ST.token||!ST.worker){ klog('Enter API key, access token and worker URL.'); return; }
-  setDot('busy'); klog('Testing session…');
+  ST.apiKey = document.getElementById('kApiKey').value.trim();
+  ST.token  = document.getElementById('kToken').value.trim();
+  ST.worker = document.getElementById('kWorker').value.trim().replace(/\/$/,'');
+  if(!ST.apiKey || !ST.token || !ST.worker){ klog('Enter API key, access token and worker URL first.'); return; }
+  setDot('busy'); klog('Testing session via NIFTY 50 quote…');
   try{
     const data = await fetchQuotes(['NSE:NIFTY 50']);
-    if(!data['NSE:NIFTY 50']) throw new Error('Quote missing NSE:NIFTY 50');
-    ST.connected=true; setDot('ok'); klog('Connected. Spot ₹'+data['NSE:NIFTY 50'].last_price);
-    localStorage.setItem('nst_apiKey', ST.apiKey); localStorage.setItem('nst_worker', ST.worker);
-    const list=getUpcomingExpiries(6);
-    const sel=document.getElementById('sExpiry'); sel.disabled=false;
-    sel.innerHTML=list.map(e=>`<option value="${e}">${e}</option>`).join('');
-    ST.selectedExpiry=list[0]; sel.onchange=()=>ST.selectedExpiry=sel.value;
-    document.getElementById('scanBtn').disabled=false;
-    document.getElementById('btRunBtn').disabled=false;
-    loadPositionsFromStorage();
-  }catch(e){ setDot('err'); klog('Connect failed: '+e.message); }
+    const q = data['NSE:NIFTY 50'];
+    if(!q) throw new Error('Quote response missing NSE:NIFTY 50');
+    ST.connected = true; setDot('ok'); klog(`Connected. Nifty spot ₹${q.last_price}`);
+    document.getElementById('kConnectBtn').textContent = 'Reconnect';
+    localStorage.setItem('nc_apiKey', ST.apiKey);
+    localStorage.setItem('nc_worker', ST.worker);
+    populateExpiries();
+    initCharts();
+    loadNiftyMiniChart();
+    document.getElementById('loadChainBtn').disabled = false;
+  }catch(e){ setDot('err'); klog('Connect failed: '+e.message); ST.connected=false; }
 }
 
-/* ══════════════════════ LIVE MODE ARM/DISARM ══════════════════════ */
-function onLiveToggle(){
-  const cb=document.getElementById('liveModeToggle');
-  const confirmBox=document.getElementById('liveConfirmText');
-  if(cb.checked){
-    confirmBox.style.display='inline-block'; confirmBox.value=''; confirmBox.focus();
-    confirmBox.onblur = confirmBox.oninput = ()=>{
-      if(confirmBox.value.trim()==='LIVE'){ armLive(); }
-    };
-  } else { disarmLive(); }
-}
-function armLive(){
-  ST.liveMode=true;
-  const banner=document.getElementById('modeBanner');
-  banner.className='mode-banner live'; banner.textContent='⚠ LIVE MODE — REAL ORDERS WILL BE PLACED ON YOUR KITE ACCOUNT';
-  klog('LIVE MODE ARMED.');
-}
-function disarmLive(){
-  ST.liveMode=false;
-  document.getElementById('liveModeToggle').checked=false;
-  document.getElementById('liveConfirmText').style.display='none';
-  const banner=document.getElementById('modeBanner');
-  banner.className='mode-banner paper'; banner.textContent='PAPER MODE — no real orders will be placed';
-  klog('Back to paper mode.');
+function populateExpiries(){
+  const list = getUpcomingExpiries(8);
+  ST.expiries = list;
+  const sel = document.getElementById('sExpiry');
+  sel.disabled = false;
+  sel.innerHTML = list.map(e=>`<option value="${e.date}">${e.date}${e.isMonthly?' (Monthly)':' (Weekly)'}</option>`).join('');
+  ST.selectedExpiry = list[0].date;
+  sel.value = ST.selectedExpiry;
+  sel.onchange = ()=>{ ST.selectedExpiry = sel.value; ST.baseline = {}; };
 }
 
-/* ══════════════════════ SCANNING TOGGLE ══════════════════════ */
-function toggleScanning(){
-  if(ST.scanning){
-    clearInterval(ST.scanTimer); ST.scanning=false;
-    document.getElementById('scanBtn').textContent='Start Scanning';
-    klog('Scanning stopped.');
-  } else {
-    ST.scanning=true; document.getElementById('scanBtn').textContent='Stop Scanning';
-    scanCycle();
-    const secs=parseInt(document.getElementById('sPoll').value,10)||10;
-    ST.scanTimer=setInterval(scanCycle, secs*1000);
-    klog('Scanning started, every '+secs+'s.');
+/* ══════════════════════ BLACK-76 MATH (forward-based — see explainer panel) ══════════════════════ */
+function normCDF(x){
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const sign=x<0?-1:1; x=Math.abs(x)/Math.SQRT2;
+  const t=1/(1+p*x);
+  const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return 0.5*(1+sign*y);
+}
+function normPDF(x){ return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI); }
+function clampSigma(s){ return Math.max(0.01, Math.min(4, s)); }
+
+function bs76Price(type,F,K,T,r,sigma){
+  if(T<=0||sigma<=0) return Math.max(0, type==='CE'?F-K:K-F);
+  const sqrtT=Math.sqrt(T), d1=(Math.log(F/K)+(sigma*sigma/2)*T)/(sigma*sqrtT), d2=d1-sigma*sqrtT, disc=Math.exp(-r*T);
+  return type==='CE' ? disc*(F*normCDF(d1)-K*normCDF(d2)) : disc*(K*normCDF(-d2)-F*normCDF(-d1));
+}
+function bs76Greeks(type,F,K,T,r,sigma){
+  if(T<=0||sigma<=0) return {delta:0,gamma:0,theta:0,vega:0};
+  const sqrtT=Math.sqrt(T), d1=(Math.log(F/K)+(sigma*sigma/2)*T)/(sigma*sqrtT), d2=d1-sigma*sqrtT, disc=Math.exp(-r*T), pdf=normPDF(d1);
+  const delta = type==='CE' ? disc*normCDF(d1) : -disc*normCDF(-d1);
+  const gamma = disc*pdf/(F*sigma*sqrtT);
+  const vega  = F*disc*pdf*sqrtT/100;
+  const theta = type==='CE'
+    ? (-(F*disc*pdf*sigma)/(2*sqrtT) + r*F*disc*normCDF(d1) - r*K*disc*normCDF(d2))/365
+    : (-(F*disc*pdf*sigma)/(2*sqrtT) - r*F*disc*normCDF(-d1) + r*K*disc*normCDF(-d2))/365;
+  return {delta,gamma,theta,vega};
+}
+/* Newton-Raphson first, bisection fallback if it fails to converge (deep ITM/OTM near expiry) */
+function impliedVol76(type,mktPrice,F,K,T,r){
+  if(T<=0||mktPrice<=0) return null;
+  let sigma=0.3;
+  for(let i=0;i<50;i++){
+    const price=bs76Price(type,F,K,T,r,sigma), diff=price-mktPrice;
+    if(Math.abs(diff)<1e-4) return clampSigma(sigma);
+    const sqrtT=Math.sqrt(T), d1=(Math.log(F/K)+(sigma*sigma/2)*T)/(sigma*sqrtT);
+    const vega=F*Math.exp(-r*T)*normPDF(d1)*sqrtT;
+    if(!isFinite(vega)||vega<1e-8) break;
+    sigma = sigma - diff/vega;
+    if(sigma<=0||!isFinite(sigma)) break;
   }
-}
-
-/* ══════════════════════ ORDER PLACEMENT ══════════════════════ */
-async function placeOrder(symbol, txnType, qty){
-  if(!ST.liveMode){
-    klog(`[PAPER] ${txnType} ${qty} x ${symbol} — simulated, no real order sent.`);
-    return {orderId:'PAPER-'+Date.now(), paper:true};
+  let lo=0.01, hi=4, plo=bs76Price(type,F,K,T,r,lo)-mktPrice, phi=bs76Price(type,F,K,T,r,hi)-mktPrice;
+  if(!isFinite(plo)||!isFinite(phi)||plo*phi>0) return null;
+  for(let i=0;i<80;i++){
+    const mid=(lo+hi)/2, pm=bs76Price(type,F,K,T,r,mid)-mktPrice;
+    if(Math.abs(pm)<1e-5) return clampSigma(mid);
+    if(plo*pm<0){ hi=mid; } else { lo=mid; plo=pm; }
   }
-  const body = new URLSearchParams({
-    tradingsymbol: symbol, exchange:'NFO', transaction_type:txnType,
-    order_type:'MARKET', quantity:String(qty), product:'MIS', validity:'DAY'
-  });
-  const res = await kiteFetch(`/kite/orders/regular`, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body});
-  const j = await res.json();
-  if(j.status!=='success') throw new Error('Order rejected: '+(j.message||JSON.stringify(j)));
-  klog(`[LIVE] ${txnType} ${qty} x ${symbol} — order #${j.data.order_id}`);
-  return {orderId:j.data.order_id, paper:false};
+  return clampSigma((lo+hi)/2);
+}
+function midOrLtp(q){
+  const buy = q.depth && q.depth.buy && q.depth.buy[0] ? q.depth.buy[0].price : 0;
+  const sell = q.depth && q.depth.sell && q.depth.sell[0] ? q.depth.sell[0].price : 0;
+  if(buy>0 && sell>0) return (buy+sell)/2;
+  return q.last_price;
 }
 
-/* ══════════════════════ SIGNAL SCAN CYCLE ══════════════════════ */
-async function scanCycle(){
-  if(!ST.connected) return;
+/* ══════════════════════ CHAIN LOAD ══════════════════════ */
+function batchOf(arr,size){ const o=[]; for(let i=0;i<arr.length;i+=size) o.push(arr.slice(i,i+size)); return o; }
+
+async function loadChain(){
+  if(!ST.connected){ klog('Connect first.'); return; }
+  const rangeN = parseInt(document.getElementById('sRange').value,10)||12;
+  const step = parseInt(document.getElementById('sStep').value,10)||50;
+  ST.rate = (parseFloat(document.getElementById('sRate').value)||6.5)/100;
+
   try{
     setDot('busy');
     const spotData = await fetchQuotes(['NSE:NIFTY 50']);
-    const spot = spotData['NSE:NIFTY 50'].last_price;
-    document.getElementById('sumSpot').textContent='₹'+spot.toFixed(2);
+    const spotQ = spotData['NSE:NIFTY 50'];
+    const spot = spotQ.last_price, prevClose = spotQ.ohlc.close;
+    const atm = Math.round(spot/step)*step;
 
-    /* OI support/resistance scan */
-    const step=50, atm=Math.round(spot/step)*step, range=parseInt(document.getElementById('sScanRange').value,10)||15;
-    const strikes=[]; for(let i=-range;i<=range;i++) strikes.push(atm+i*step);
-    const idents=[]; strikes.forEach(k=>{ idents.push(`NFO:${nfoSym(ST.selectedExpiry,k,'CE')}`); idents.push(`NFO:${nfoSym(ST.selectedExpiry,k,'PE')}`); });
-    const qm = await fetchQuotes(idents);
-    let support=atm, maxPutOI=-1, resistance=atm, maxCallOI=-1;
-    strikes.forEach(k=>{
-      const ce=qm[`NFO:${nfoSym(ST.selectedExpiry,k,'CE')}`], pe=qm[`NFO:${nfoSym(ST.selectedExpiry,k,'PE')}`];
-      if(pe && pe.oi>maxPutOI){ maxPutOI=pe.oi; support=k; }
-      if(ce && ce.oi>maxCallOI){ maxCallOI=ce.oi; resistance=k; }
+    /* Futures LTP as forward price (Black-76) */
+    const futSym = nfoFutSym(getCurrentFuturesMonth());
+    let forward = spot, futLtp = null, usedForwardApprox = false;
+    try{
+      const futData = await fetchQuotes([`NFO:${futSym}`]);
+      const fq = futData[`NFO:${futSym}`];
+      if(fq && fq.last_price>0){ forward = fq.last_price; futLtp = fq.last_price; }
+      else { usedForwardApprox = true; }
+    }catch(e){ usedForwardApprox = true; }
+    if(usedForwardApprox) klog(`Futures quote (${futSym}) unavailable — falling back to spot as forward (less accurate).`);
+
+    const strikes = []; for(let i=-rangeN;i<=rangeN;i++) strikes.push(atm+i*step);
+    const idents = [];
+    strikes.forEach(k=>{ idents.push(`NFO:${nfoSym(ST.selectedExpiry,k,'CE')}`); idents.push(`NFO:${nfoSym(ST.selectedExpiry,k,'PE')}`); });
+    const quoteMap = await fetchQuotes(idents);
+
+    const expDate = new Date(ST.selectedExpiry+'T15:30:00+05:30');
+    const now = new Date();
+    const T = Math.max((expDate-now)/(365*24*3600*1000), 0.0002);
+    const dte = Math.max(0, Math.ceil((expDate-now)/(24*3600*1000)));
+
+    const chainRows = strikes.map(strike=>{
+      const ceSym = `NFO:${nfoSym(ST.selectedExpiry,strike,'CE')}`, peSym = `NFO:${nfoSym(ST.selectedExpiry,strike,'PE')}`;
+      const ceQ = quoteMap[ceSym], peQ = quoteMap[peSym];
+      const build = (sym,q)=>{
+        if(!q) return {tag:'flat',label:'—',oiChg:0};
+        const base = ST.baseline[sym];
+        if(!base){ ST.baseline[sym]={oi:q.oi, ltp:q.last_price}; return {tag:'flat',label:'base',oiChg:0}; }
+        const oiUp=q.oi>base.oi, ltpUp=q.last_price>base.ltp, oiChg=q.oi-base.oi;
+        if(ltpUp&&oiUp) return {tag:'LB',label:'Long Buildup',oiChg};
+        if(!ltpUp&&oiUp) return {tag:'SB',label:'Short Buildup',oiChg};
+        if(ltpUp&&!oiUp) return {tag:'SC',label:'Short Covering',oiChg};
+        return {tag:'LU',label:'Long Unwinding',oiChg};
+      };
+      const ceMid = ceQ ? midOrLtp(ceQ) : null, peMid = peQ ? midOrLtp(peQ) : null;
+      const ceIV = ceMid ? impliedVol76('CE',ceMid,forward,strike,T,ST.rate) : null;
+      const peIV = peMid ? impliedVol76('PE',peMid,forward,strike,T,ST.rate) : null;
+      const ceG = ceIV!=null ? bs76Greeks('CE',forward,strike,T,ST.rate,ceIV) : null;
+      const peG = peIV!=null ? bs76Greeks('PE',forward,strike,T,ST.rate,peIV) : null;
+      return {
+        strike,
+        ce: ceQ ? {oi:ceQ.oi, vol:ceQ.volume, ltp:ceQ.last_price, iv:ceIV, g:ceG, build:build(ceSym,ceQ)} : null,
+        pe: peQ ? {oi:peQ.oi, vol:peQ.volume, ltp:peQ.last_price, iv:peIV, g:peG, build:build(peSym,peQ)} : null
+      };
     });
-    document.getElementById('sumSupport').textContent=support;
-    document.getElementById('sumResistance').textContent=resistance;
-    document.getElementById('sumLastScan').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});
 
-    evaluateSignal('support', spot, support, 'long');
-    evaluateSignal('resistance', spot, resistance, 'short');
+    const totalCallOI = chainRows.reduce((s,r)=>s+(r.ce?r.ce.oi:0),0);
+    const totalPutOI  = chainRows.reduce((s,r)=>s+(r.pe?r.pe.oi:0),0);
+    const totalCallVol = chainRows.reduce((s,r)=>s+(r.ce?r.ce.vol:0),0);
+    const totalPutVol  = chainRows.reduce((s,r)=>s+(r.pe?r.pe.vol:0),0);
+    const pcr = totalCallOI>0 ? totalPutOI/totalCallOI : 0;
+    const pcrVol = totalCallVol>0 ? totalPutVol/totalCallVol : 0;
 
-    await monitorOpenPositions(qm, atm);
-    updateSummary();
-    setDot('ok');
-  }catch(e){ setDot('err'); klog('Scan error: '+e.message); }
+    let maxPain=atm, minPain=Infinity;
+    strikes.forEach(settleAt=>{
+      let pain=0;
+      chainRows.forEach(r=>{
+        if(r.ce) pain += Math.max(0,settleAt-r.strike)*r.ce.oi;
+        if(r.pe) pain += Math.max(0,r.strike-settleAt)*r.pe.oi;
+      });
+      if(pain<minPain){ minPain=pain; maxPain=settleAt; }
+    });
+
+    let supportStrike=atm, maxPutOI=-1, resistStrike=atm, maxCallOI=-1;
+    chainRows.forEach(r=>{
+      if(r.pe && r.pe.oi>maxPutOI){ maxPutOI=r.pe.oi; supportStrike=r.strike; }
+      if(r.ce && r.ce.oi>maxCallOI){ maxCallOI=r.ce.oi; resistStrike=r.strike; }
+    });
+
+    const atmRow = chainRows.find(r=>r.strike===atm);
+    const ivs=[atmRow?.ce?.iv, atmRow?.pe?.iv].filter(v=>v!=null);
+    const avgIv = ivs.length ? ivs.reduce((a,b)=>a+b,0)/ivs.length*100 : null;
+    const straddlePx = (atmRow?.ce?.ltp||0)+(atmRow?.pe?.ltp||0);
+    const straddlePct = spot>0 ? straddlePx/spot*100 : 0;
+
+    renderSummary({spot,prevClose,atm,dte,pcr,pcrVol,maxPain,totalCallOI,totalPutOI,avgIv,futLtp,straddlePx,straddlePct,supportStrike,resistStrike});
+    renderChain(chainRows, atm, supportStrike, resistStrike);
+    renderGann(spot, step);
+    pushTrendPoint({time:Math.floor(Date.now()/1000), maxPain, spot, pcr});
+    checkAlerts({pcr, maxPain, spot, chainRows});
+
+    setDot('ok'); klog(`Chain loaded: ${chainRows.length} strikes, expiry ${ST.selectedExpiry}, forward ₹${forward.toFixed(1)}${usedForwardApprox?' (spot-fallback)':' (futures)'}.`);
+  }catch(e){ setDot('err'); klog('Chain load failed: '+e.message); }
 }
 
-/* touch-then-reverse state machine per level */
-function evaluateSignal(levelKey, spot, levelPrice, direction){
-  const touch=parseFloat(document.getElementById('sTouch').value)||15;
-  const confirm=parseFloat(document.getElementById('sConfirm').value)||8;
-  const cooldownMin=parseFloat(document.getElementById('sCooldown').value)||15;
-  const now=Date.now();
-  if(!ST.levelState[levelKey]) ST.levelState[levelKey]={armed:false, armedAt:null, levelSeen:null};
-  const st=ST.levelState[levelKey];
-  if(st.cooldownUntil && now<st.cooldownUntil) return;
+/* ══════════════════════ RENDER: summary / chain / gann ══════════════════════ */
+function fmtNum(n){ return n==null?'—':Math.round(n).toLocaleString('en-IN'); }
+function fmtPx(n){ return n==null?'—':n.toFixed(2); }
+function fmtG(n,d){ return n==null?'—':n.toFixed(d); }
 
-  const dist = spot - levelPrice; // +ve = above level, -ve = below
-  const inTouchZone = Math.abs(dist) <= touch;
+function renderSummary(s){
+  const chg=s.spot-s.prevClose, chgPct=chg/s.prevClose*100;
+  document.getElementById('sumSpot').textContent='₹'+s.spot.toFixed(2);
+  const chgEl=document.getElementById('sumSpotChg');
+  chgEl.textContent=`${chg>=0?'+':''}${chg.toFixed(2)} (${chgPct.toFixed(2)}%)`;
+  chgEl.style.color=chg>=0?'var(--bull)':'var(--bear)';
+  document.getElementById('sumFut').textContent = s.futLtp!=null ? '₹'+s.futLtp.toFixed(2) : '—';
+  const prem = s.futLtp!=null ? s.futLtp-s.spot : null;
+  document.getElementById('sumFutPrem').textContent = prem!=null ? `${prem>=0?'+':''}${prem.toFixed(1)} pts` : 'using spot fallback';
+  document.getElementById('sumAtm').textContent=s.atm;
+  document.getElementById('sumDte').textContent=s.dte+'d';
+  document.getElementById('sumPcr').textContent=s.pcr.toFixed(2);
+  const pcrTag=document.getElementById('sumPcrTag');
+  if(s.pcr>1.3){ pcrTag.textContent='Bullish tilt'; pcrTag.style.color='var(--bull)'; }
+  else if(s.pcr<0.7){ pcrTag.textContent='Bearish tilt'; pcrTag.style.color='var(--bear)'; }
+  else { pcrTag.textContent='Neutral zone'; pcrTag.style.color='var(--text2)'; }
+  document.getElementById('sumMaxPain').textContent=s.maxPain;
+  document.getElementById('sumCallOi').textContent=fmtNum(s.totalCallOI);
+  document.getElementById('sumPutOi').textContent=fmtNum(s.totalPutOI);
+  document.getElementById('sumIv').textContent=s.avgIv!=null?s.avgIv.toFixed(1)+'%':'—';
+  document.getElementById('sumStraddle').textContent = `₹${s.straddlePx.toFixed(0)} (${s.straddlePct.toFixed(1)}%)`;
+  document.getElementById('sumUpdated').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});
 
-  if(inTouchZone && !st.armed){ st.armed=true; st.levelSeen=levelPrice; klog(`${levelKey} touch-zone entered near ${levelPrice} (spot ${spot.toFixed(1)})`); }
-
-  if(st.armed){
-    if(direction==='long' && (spot - st.levelSeen) >= confirm){
-      fireSignal('CE', levelPrice, spot); st.armed=false; st.cooldownUntil = now + cooldownMin*60000;
-    } else if(direction==='short' && (st.levelSeen - spot) >= confirm){
-      fireSignal('PE', levelPrice, spot); st.armed=false; st.cooldownUntil = now + cooldownMin*60000;
-    } else if(Math.abs(spot-st.levelSeen) > touch*2){
-      st.armed=false; // moved away without confirming — disarm, will re-arm on next touch
-    }
-  }
+  document.getElementById('dsPrem').textContent = prem!=null ? `${prem>=0?'+':''}${prem.toFixed(1)} pts` : '—';
+  document.getElementById('dsPcrVol').textContent = s.pcrVol.toFixed(2);
+  document.getElementById('dsSupport').textContent = s.supportStrike;
+  document.getElementById('dsResistance').textContent = s.resistStrike;
+  document.getElementById('dsStraddlePx').textContent = '₹'+s.straddlePx.toFixed(0);
+  document.getElementById('dsStraddlePct').textContent = s.straddlePct.toFixed(2)+'%';
 }
 
-async function fireSignal(optType, levelPrice, spot){
-  if(ST.dayHalted){ klog('Entry blocked — day kill-switch active.'); return; }
-  if(document.getElementById('ckBlockLoss').checked){
-    const blockAt = parseFloat(document.getElementById('blockLossVal').value)||0;
-    const dayTotal = ST._lastDayTotal || 0;
-    if(dayTotal <= -Math.abs(blockAt)){ klog('Entry blocked — Booked+M2M loss exceeds block threshold.'); return; }
-  }
-  const maxPos=parseInt(document.getElementById('sMaxPos').value,10)||2;
-  if(ST.positions.filter(p=>p.status==='open').length >= maxPos){ klog('Entry skipped — max concurrent positions reached.'); return; }
-
-  const step=50, strike=Math.round(spot/step)*step;
-  const symbol = nfoSym(ST.selectedExpiry, strike, optType);
-  const q = (await fetchQuotes([`NFO:${symbol}`]))[`NFO:${symbol}`];
-  if(!q || !q.last_price){ klog('Signal fired but quote unavailable for '+symbol); return; }
-
-  const lots=parseInt(document.getElementById('sLots').value,10)||4;
-  const lotSize=parseInt(document.getElementById('sLotSize').value,10)||65;
-  const entryPx = q.last_price;
-  const tgPct=[1,2,3,4].map(n=>parseFloat(document.getElementById('tg'+n).value)/100);
-  const slPct=parseFloat(document.getElementById('slPct').value)/100;
-
-  const order = await placeOrder(symbol, 'BUY', lots*lotSize);
-  const pos = {
-    id: 'P'+Date.now(), symbol, strike, side: optType==='CE'?'LONG (via CE)':'SHORT (via PE)',
-    entryPx, entryTime: new Date().toLocaleTimeString('en-IN',{hour12:false}),
-    lots, lotSize, lotsRemaining: lots, orderId: order.orderId, paper: order.paper,
-    targets: tgPct.map(p=>+(entryPx*(1+p)).toFixed(2)),
-    targetsHit: [false,false,false,false],
-    slPx: +(entryPx*(1-slPct)).toFixed(2),
-    status:'open', exits:[], bookedPL:0
-  };
-  ST.positions.push(pos);
-  savePositionsToStorage();
-  klog(`SIGNAL: ${pos.side} ${symbol} — BUY ${lots} lots @ ~₹${entryPx} (${order.paper?'paper':'live #'+order.orderId})`);
-  renderPositions();
-}
-
-/* ══════════════════════ MONITOR OPEN POSITIONS ══════════════════════ */
-async function monitorOpenPositions(qm, atm){
-  const openPositions = ST.positions.filter(p=>p.status==='open');
-  if(!openPositions.length) return;
-  for(const pos of openPositions){
-    let q = qm[`NFO:${pos.symbol}`];
-    if(!q){ const r=await fetchQuotes([`NFO:${pos.symbol}`]); q=r[`NFO:${pos.symbol}`]; }
-    if(!q) continue;
-    const ltp = q.last_price;
-
-    for(let i=0;i<4;i++){
-      if(!pos.targetsHit[i] && ltp>=pos.targets[i] && pos.lotsRemaining>0){
-        const sellQty = pos.lotSize; // 1 lot per target
-        const order = await placeOrder(pos.symbol, 'SELL', sellQty);
-        pos.targetsHit[i]=true; pos.lotsRemaining -= 1;
-        const pl = (ltp - pos.entryPx) * sellQty;
-        pos.bookedPL += pl;
-        pos.exits.push({time:new Date().toLocaleTimeString('en-IN',{hour12:false}), label:`TGT${i+1}`, px:ltp, pl});
-        klog(`${pos.symbol} TGT${i+1} hit @ ₹${ltp} — sold 1 lot (${order.paper?'paper':'live #'+order.orderId})`);
-        if(pos.lotsRemaining<=0){ pos.status='closed'; klog(`${pos.symbol} fully closed.`); }
-        savePositionsToStorage();
-      }
-    }
-    if(pos.status==='open' && ltp<=pos.slPx && pos.lotsRemaining>0){
-      const sellQty = pos.lotsRemaining*pos.lotSize;
-      const order = await placeOrder(pos.symbol, 'SELL', sellQty);
-      const pl = (ltp - pos.entryPx) * sellQty;
-      pos.bookedPL += pl;
-      pos.exits.push({time:new Date().toLocaleTimeString('en-IN',{hour12:false}), label:'SL', px:ltp, pl});
-      pos.lotsRemaining=0; pos.status='closed';
-      klog(`${pos.symbol} STOP LOSS hit @ ₹${ltp} — exited remaining (${order.paper?'paper':'live #'+order.orderId})`);
-      savePositionsToStorage();
-    }
-  }
-  renderPositions();
-  await updateSummary();
-
-  /* day-level kill switches — use the live booked+M2M just computed */
-  const dayTotal = ST._lastDayTotal || 0;
-  if(document.getElementById('ckDayProfit').checked){
-    const th=parseFloat(document.getElementById('dayProfitVal').value)||Infinity;
-    if(dayTotal>=th && !ST.dayHalted){ klog('Day PROFIT target hit — exiting all & halting new entries.'); ST.dayHalted=true; await exitAllNow(); }
-  }
-  if(document.getElementById('ckDayLoss').checked){
-    const th=parseFloat(document.getElementById('dayLossVal').value)||Infinity;
-    if(dayTotal<=-Math.abs(th) && !ST.dayHalted){ klog('Day LOSS limit hit — exiting all & halting new entries.'); ST.dayHalted=true; await exitAllNow(); }
-  }
-}
-
-function computePL(){
-  let booked=0; ST.positions.forEach(p=>{ booked+=p.bookedPL; });
-  return {booked};
-}
-
-async function updateSummary(){
-  const openPositions = ST.positions.filter(p=>p.status==='open');
-  let booked=0, m2m=0;
-  const idents = openPositions.map(p=>`NFO:${p.symbol}`);
-  const qm = idents.length ? await fetchQuotes(idents) : {};
-  ST.positions.forEach(p=>{
-    booked += p.bookedPL;
-    if(p.status==='open'){
-      const q = qm[`NFO:${p.symbol}`];
-      if(q) m2m += (q.last_price - p.entryPx) * (p.lotsRemaining*p.lotSize);
-    }
-  });
-  document.getElementById('sumOpenPos').textContent = openPositions.length;
-  document.getElementById('sumBooked').textContent = '₹'+booked.toFixed(0);
-  document.getElementById('sumM2M').textContent = '₹'+m2m.toFixed(0);
-  const total=document.getElementById('sumDayTotal');
-  total.textContent='₹'+(booked+m2m).toFixed(0);
-  total.style.color = (booked+m2m)>=0 ? 'var(--bull)' : 'var(--bear)';
-  ST._lastDayTotal = booked+m2m;
-}
-
-/* ══════════════════════ MANUAL EXIT ACTIONS ══════════════════════ */
-async function exitAllNow(){
-  const openPositions = ST.positions.filter(p=>p.status==='open' && p.lotsRemaining>0);
-  for(const pos of openPositions){
-    const qm = await fetchQuotes([`NFO:${pos.symbol}`]);
-    const ltp = (qm[`NFO:${pos.symbol}`]||{}).last_price || pos.entryPx;
-    const order = await placeOrder(pos.symbol, 'SELL', pos.lotsRemaining*pos.lotSize);
-    const pl = (ltp-pos.entryPx)*(pos.lotsRemaining*pos.lotSize);
-    pos.bookedPL += pl;
-    pos.exits.push({time:new Date().toLocaleTimeString('en-IN',{hour12:false}), label:'MANUAL EXIT ALL', px:ltp, pl});
-    pos.lotsRemaining=0; pos.status='closed';
-  }
-  savePositionsToStorage(); renderPositions(); updateSummary();
-  klog('Exit All executed on '+openPositions.length+' position(s).');
-}
-async function exitPartial(posId, nTargets){
-  const pos = ST.positions.find(p=>p.id===posId); if(!pos||pos.status!=='open') return;
-  const qm = await fetchQuotes([`NFO:${pos.symbol}`]); const ltp=(qm[`NFO:${pos.symbol}`]||{}).last_price||pos.entryPx;
-  let sold=0;
-  for(let i=0;i<nTargets && i<4;i++){
-    if(!pos.targetsHit[i] && pos.lotsRemaining>0){
-      pos.targetsHit[i]=true; pos.lotsRemaining-=1; sold+=1;
-      const pl=(ltp-pos.entryPx)*pos.lotSize; pos.bookedPL+=pl;
-      pos.exits.push({time:new Date().toLocaleTimeString('en-IN',{hour12:false}), label:`Manual TGT${i+1}`, px:ltp, pl});
-    }
-  }
-  if(sold>0) await placeOrder(pos.symbol,'SELL',sold*pos.lotSize);
-  if(pos.lotsRemaining<=0) pos.status='closed';
-  savePositionsToStorage(); renderPositions(); updateSummary();
-}
-
-/* ══════════════════════ RENDER ══════════════════════ */
-function renderPositions(){
-  const tbody=document.getElementById('posBody');
-  if(!ST.positions.length){ tbody.innerHTML='<tr><td colspan="7" class="empty-state">No positions yet.</td></tr>'; return; }
-  tbody.innerHTML = ST.positions.slice().reverse().map(p=>{
-    const exitsHtml = p.exits.map(e=>`<span class="exit-line">${e.time} <b>${e.label}</b> @ ₹${e.px.toFixed(2)} (${e.pl>=0?'+':''}${e.pl.toFixed(0)})</span>`).join('') || '<span class="exit-line">—</span>';
-    const tgtHtml = p.targets.map((t,i)=>`T${i+1}: ₹${t}${p.targetsHit[i]?' ✓':''}`).join('<br>') + `<br>SL: ₹${p.slPx}`;
-    return `<tr class="${p.status==='closed'?'closed':''}">
-      <td>${p.symbol}<br><span style="color:var(--text3)">${p.side} · ${p.paper?'PAPER':'LIVE'}</span></td>
-      <td>${p.entryTime}<br>BUY ${p.lots} @ ₹${p.entryPx}</td>
-      <td>${tgtHtml}</td>
-      <td>${exitsHtml}</td>
-      <td style="color:${p.bookedPL>=0?'var(--bull)':'var(--bear)'}">₹${p.bookedPL.toFixed(0)}</td>
-      <td>${p.lotsRemaining} lot(s) open</td>
-      <td>${p.status==='open' ? `<div class="tgt-btns">
-          <button class="small ghost" onclick="exitPartial('${p.id}',1)">Exit T1</button>
-          <button class="small ghost" onclick="exitPartial('${p.id}',2)">Exit T1+2</button>
-          <button class="small ghost" onclick="exitPartial('${p.id}',3)">Exit T1+2+3</button>
-          <button class="small danger" onclick="exitPartial('${p.id}',4)">Exit All Legs</button>
-        </div>` : '—'}</td>
+function renderChain(rows, atm, supportStrike, resistStrike){
+  const maxOI = Math.max(1, ...rows.map(r=>Math.max(r.ce?r.ce.oi:0, r.pe?r.pe.oi:0)));
+  const tbody = document.getElementById('chainBody');
+  tbody.innerHTML = rows.map(r=>{
+    const cls = [r.strike===atm?'atm':'', r.strike===supportStrike?'sup':'', r.strike===resistStrike?'res':''].join(' ').trim();
+    const c=r.ce, p=r.pe;
+    const cBar = c?`<div class="oi-bar c" style="width:${Math.max(4,c.oi/maxOI*100)}%"></div>`:'';
+    const pBar = p?`<div class="oi-bar p" style="width:${Math.max(4,p.oi/maxOI*100)}%"></div>`:'';
+    const cChg = c?c.build.oiChg:0, pChg = p?p.build.oiChg:0;
+    return `<tr class="${cls}">
+      <td>${c?fmtNum(c.oi):'—'}${cBar}</td>
+      <td style="color:${cChg>0?'var(--bull)':cChg<0?'var(--bear)':'var(--text2)'}">${c?(cChg>=0?'+':'')+fmtNum(cChg):'—'}</td>
+      <td><span class="tag tag-${c?c.build.tag:'flat'}">${c?c.build.label:'—'}</span></td>
+      <td>${c?fmtNum(c.vol):'—'}</td>
+      <td>${c&&c.iv!=null?(c.iv*100).toFixed(1):'—'}</td>
+      <td>${c?fmtPx(c.ltp):'—'}</td>
+      <td>${c&&c.g?fmtG(c.g.delta,2):'—'}</td>
+      <td>${c&&c.g?fmtG(c.g.theta,2):'—'}</td>
+      <td class="strike">${r.strike}</td>
+      <td>${p&&p.g?fmtG(p.g.theta,2):'—'}</td>
+      <td>${p&&p.g?fmtG(p.g.delta,2):'—'}</td>
+      <td>${p?fmtPx(p.ltp):'—'}</td>
+      <td>${p&&p.iv!=null?(p.iv*100).toFixed(1):'—'}</td>
+      <td>${p?fmtNum(p.vol):'—'}</td>
+      <td><span class="tag tag-${p?p.build.tag:'flat'}">${p?p.build.label:'—'}</span></td>
+      <td style="color:${pChg>0?'var(--bull)':pChg<0?'var(--bear)':'var(--text2)'}">${p?(pChg>=0?'+':'')+fmtNum(pChg):'—'}</td>
+      <td>${p?fmtNum(p.oi):'—'}${pBar}</td>
     </tr>`;
   }).join('');
 }
 
-/* ══════════════════════ PERSISTENCE (positions only — never store keys/token beyond worker+key) ══════════════════════ */
-function savePositionsToStorage(){ try{ localStorage.setItem('nst_positions', JSON.stringify(ST.positions)); }catch(e){} }
-function loadPositionsFromStorage(){ try{ const raw=localStorage.getItem('nst_positions'); if(raw) ST.positions=JSON.parse(raw); renderPositions(); updateSummary(); }catch(e){} }
+/* Gann Square of 9 — public-domain method: 8 levels each side, 45° increments */
+function renderGann(spot, step){
+  const r = Math.sqrt(spot);
+  const res=[], sup=[];
+  for(let n=1;n<=8;n++){
+    res.push(Math.pow(r + n*0.125, 2));
+    sup.push(Math.pow(Math.max(r - n*0.125, 0), 2));
+  }
+  const body = document.getElementById('gannBody');
+  const rows = [];
+  for(let i=0;i<8;i++){
+    rows.push(`<tr><td class="c-bull" style="color:var(--bull)">${res[i].toFixed(0)}</td><td style="color:var(--bear)">${sup[7-i].toFixed(0)}</td></tr>`);
+  }
+  body.innerHTML = rows.join('');
+}
 
+/* ══════════════════════ CHARTS ══════════════════════ */
+function initCharts(){
+  const chartOpts = {
+    layout:{background:{color:'#12151d'}, textColor:'#7c869e', fontFamily:'IBM Plex Mono'},
+    grid:{vertLines:{color:'#232838'}, horzLines:{color:'#232838'}},
+    timeScale:{timeVisible:true, secondsVisible:false, borderColor:'#232838'},
+    rightPriceScale:{borderColor:'#232838'},
+    crosshair:{mode:0}
+  };
+  const mpEl = document.getElementById('maxPainChart');
+  maxPainChart = LightweightCharts.createChart(mpEl, {...chartOpts, width:mpEl.clientWidth, height:230});
+  mpLine = maxPainChart.addLineSeries({color:'#f0a202', lineWidth:2, title:'Max Pain'});
+  spotLine = maxPainChart.addLineSeries({color:'#38bdf8', lineWidth:2, title:'Spot'});
+
+  const pcrEl = document.getElementById('pcrChart');
+  pcrChart = LightweightCharts.createChart(pcrEl, {...chartOpts, width:pcrEl.clientWidth, height:120});
+  pcrLine = pcrChart.addLineSeries({color:'#a78bfa', lineWidth:2, title:'PCR'});
+
+  const nfEl = document.getElementById('niftyChart');
+  niftyChart = LightweightCharts.createChart(nfEl, {...chartOpts, width:nfEl.clientWidth, height:230});
+  niftyCandles = niftyChart.addCandlestickSeries({upColor:'#16a34a', downColor:'#ef4444', borderVisible:false, wickUpColor:'#16a34a', wickDownColor:'#ef4444'});
+  niftyTrendline = niftyChart.addLineSeries({color:'#f0a202', lineWidth:1});
+
+  window.addEventListener('resize', ()=>{
+    maxPainChart.applyOptions({width:mpEl.clientWidth});
+    pcrChart.applyOptions({width:pcrEl.clientWidth});
+    niftyChart.applyOptions({width:nfEl.clientWidth});
+  });
+}
+
+function pushTrendPoint(pt){
+  ST.maxPainHistory.push(pt);
+  if(ST.maxPainHistory.length>500) ST.maxPainHistory.shift();
+  mpLine.setData(ST.maxPainHistory.map(p=>({time:p.time, value:p.maxPain})));
+  spotLine.setData(ST.maxPainHistory.map(p=>({time:p.time, value:p.spot})));
+  pcrLine.setData(ST.maxPainHistory.map(p=>({time:p.time, value:p.pcr})));
+}
+
+/* NIFTY daily mini-chart — reuses TRAM's proven historical endpoint convention */
+async function loadNiftyMiniChart(){
+  try{
+    const to = new Date(), from = new Date(); from.setDate(from.getDate()-90);
+    const fmt = d => localDateStr(d);
+    const url = `/kite/instruments/historical/${ST.spotToken}/day?from=${fmt(from)}&to=${fmt(to)}&continuous=0&oi=0`;
+    const res = await kiteFetch(url);
+    const j = await res.json();
+    const candles = (j.data && j.data.candles || []).map(c=>({time:Math.floor(new Date(c[0]).getTime()/1000), open:c[1], high:c[2], low:c[3], close:c[4]}));
+    if(!candles.length){ klog('Nifty daily candles empty — check /kite/instruments/historical route.'); return; }
+    niftyCandles.setData(candles);
+    detectPatternAndTrendline(candles);
+  }catch(e){ klog('Nifty mini-chart failed: '+e.message); }
+}
+
+function detectPatternAndTrendline(candles){
+  const n = candles.length;
+  const last = candles[n-1], prev = candles[n-2];
+  let tag = null;
+  const body = Math.abs(last.close-last.open), range = last.high-last.low || 1;
+  const upperWick = last.high-Math.max(last.open,last.close), lowerWick = Math.min(last.open,last.close)-last.low;
+  if(prev){
+    const prevBody = Math.abs(prev.close-prev.open);
+    if(prev.close<prev.open && last.close>last.open && last.open<=prev.close && last.close>=prev.open) tag='Bullish Engulfing';
+    else if(prev.close>prev.open && last.close<last.open && last.open>=prev.close && last.close<=prev.open) tag='Bearish Engulfing';
+  }
+  if(!tag && body <= 0.1*range) tag='Doji';
+  if(!tag && lowerWick >= 2*body && upperWick <= body*0.5) tag='Hammer';
+  if(!tag && upperWick >= 2*body && lowerWick <= body*0.5) tag='Shooting Star';
+  document.getElementById('niftyPatternTag').innerHTML = tag ? `<span class="pattern-tag">${tag} (latest candle)</span>` : '';
+
+  /* naive auto-trendline: connect last two same-type pivots (2-bar pivot definition) over last 40 bars */
+  const window_ = candles.slice(-40);
+  const pivotHighs=[], pivotLows=[];
+  for(let i=2;i<window_.length-2;i++){
+    const c=window_[i];
+    if(c.high>window_[i-1].high && c.high>window_[i-2].high && c.high>window_[i+1].high && c.high>window_[i+2].high) pivotHighs.push({time:c.time,value:c.high});
+    if(c.low<window_[i-1].low && c.low<window_[i-2].low && c.low<window_[i+1].low && c.low<window_[i+2].low) pivotLows.push({time:c.time,value:c.low});
+  }
+  let linePts = [];
+  if(pivotHighs.length>=2){ const a=pivotHighs[pivotHighs.length-2], b=pivotHighs[pivotHighs.length-1]; linePts=[a,b]; }
+  else if(pivotLows.length>=2){ const a=pivotLows[pivotLows.length-2], b=pivotLows[pivotLows.length-1]; linePts=[a,b]; }
+  niftyTrendline.setData(linePts);
+}
+
+/* ══════════════════════ ALERTS ══════════════════════ */
+function fireAlert(key, msg){
+  if(ST.alertsFiredKeys.has(key)) return;
+  ST.alertsFiredKeys.add(key);
+  const el = document.getElementById('alertsFired');
+  const div = document.createElement('div'); div.className='alert-fired'; div.textContent = `⚠ ${msg}`;
+  el.prepend(div);
+  klog('ALERT: '+msg);
+  if(window.Notification && Notification.permission==='granted') new Notification('Nifty Option Chain', {body:msg});
+}
+function checkAlerts({pcr, maxPain, spot, chainRows}){
+  const pcrHi = parseFloat(document.getElementById('alPcrHi').value);
+  const pcrLo = parseFloat(document.getElementById('alPcrLo').value);
+  const mpDist = parseFloat(document.getElementById('alMpDist').value);
+  const oiSpikePct = parseFloat(document.getElementById('alOiSpike').value);
+  if(pcr>=pcrHi) fireAlert('pcrHi_'+Math.floor(pcr*100), `PCR crossed above ${pcrHi} (now ${pcr.toFixed(2)}) — bullish tilt`);
+  if(pcr<=pcrLo) fireAlert('pcrLo_'+Math.floor(pcr*100), `PCR crossed below ${pcrLo} (now ${pcr.toFixed(2)}) — bearish tilt`);
+  if(Math.abs(spot-maxPain)>=mpDist) fireAlert('mp_'+maxPain, `Spot is ${Math.abs(spot-maxPain).toFixed(0)} pts from Max Pain (${maxPain})`);
+  chainRows.forEach(r=>{
+    [['ce',r.ce],['pe',r.pe]].forEach(([side,leg])=>{
+      if(!leg) return;
+      const base = ST.baseline[`NFO:${nfoSym(ST.selectedExpiry,r.strike,side==='ce'?'CE':'PE')}`];
+      if(base && base.oi>0){
+        const pctChg = (leg.oi-base.oi)/base.oi*100;
+        if(Math.abs(pctChg)>=oiSpikePct) fireAlert(`oi_${side}_${r.strike}`, `${r.strike}${side.toUpperCase()} OI moved ${pctChg>=0?'+':''}${pctChg.toFixed(0)}% this session`);
+      }
+    });
+  });
+}
+
+/* ══════════════════════ AUTO-REFRESH ══════════════════════ */
+document.getElementById('sRefresh').addEventListener('change', function(){
+  if(ST.refreshTimer){ clearInterval(ST.refreshTimer); ST.refreshTimer=null; }
+  const secs = parseInt(this.value,10);
+  if(secs>0) ST.refreshTimer = setInterval(()=>{ if(ST.connected) loadChain(); }, secs*1000);
+});
+
+/* ══════════════════════ RESTORE SAVED (worker + key only, never token) ══════════════════════ */
 (function restore(){
-  const k=localStorage.getItem('nst_apiKey'), w=localStorage.getItem('nst_worker');
+  const k=localStorage.getItem('nc_apiKey'), w=localStorage.getItem('nc_worker');
   if(k) document.getElementById('kApiKey').value=k;
   if(w) document.getElementById('kWorker').value=w;
 })();
-
-/* ══════════════════════════════════════════════════════════════
-   BACKTEST ENGINE
-   Replays the exact signal-tracker logic above against history.
-   See the methodology note in the panel for documented limitations.
-   ══════════════════════════════════════════════════════════════ */
-let btEquityChart, btEquityLine, btTokenMap=null;
-
-function btLog(msg){
-  const el=document.getElementById('btLog');
-  const ts=new Date().toLocaleTimeString('en-IN',{hour12:false});
-  el.innerHTML += `<div>[${ts}] ${msg}</div>`; el.scrollTop=el.scrollHeight;
-}
-function btSetProgress(pct){ document.getElementById('btProgress').style.width=Math.min(100,pct)+'%'; }
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-/* One-time NFO instrument dump fetch, filtered to NIFTY options — needed because the
-   historical-candles endpoint requires numeric instrument_token, not a tradingsymbol. */
-async function loadInstrumentTokenMap(){
-  if(btTokenMap) return btTokenMap;
-  btLog('Fetching NFO instrument dump (one-time, filtered to NIFTY options)…');
-  const res = await kiteFetch(`/kite/instruments/NFO`);
-  const text = await res.text();
-  const lines = text.split('\n'); const header=lines[0].split(','); const idx={};
-  header.forEach((h,i)=>idx[h.trim()]=i);
-  const map = {};
-  for(let i=1;i<lines.length;i++){
-    if(!lines[i]) continue;
-    const c=lines[i].split(',');
-    if(c[idx.name]!=='NIFTY' || c[idx.segment]!=='NFO-OPT') continue;
-    map[c[idx.tradingsymbol]] = c[idx.instrument_token];
-  }
-  if(!Object.keys(map).length) throw new Error('No NIFTY-NFO-OPT rows parsed from instrument dump.');
-  btTokenMap = map;
-  btLog(`Resolved ${Object.keys(map).length} NIFTY option tokens.`);
-  return map;
-}
-function resolveToken(expiry, strike, type){
-  const sym = nfoSym(expiry, strike, type);
-  return btTokenMap ? btTokenMap[sym] : null;
-}
-
-async function fetchHistorical(token, interval, from, to, oi){
-  const url = `/kite/instruments/historical/${token}/${interval}?from=${from}&to=${to}&continuous=0&oi=${oi?1:0}`;
-  const res = await kiteFetch(url);
-  const j = await res.json();
-  return (j.data && j.data.candles) || [];
-}
-function nextTuesdayOnOrAfter(d){
-  const x = new Date(d); while(x.getDay()!==2) x.setDate(x.getDate()+1); return x;
-}
-function fmtDate(d){ return localDateStr(d); }
-
-async function runBacktest(){
-  if(!ST.connected){ btLog('Connect first.'); return; }
-  const fromStr = document.getElementById('btFrom').value.trim();
-  const toStr = document.getElementById('btTo').value.trim();
-  if(!fromStr || !toStr){ btLog('Enter both From and To dates (YYYY-MM-DD).'); return; }
-  const fromD = new Date(fromStr+'T00:00:00'), toD = new Date(toStr+'T00:00:00');
-  if(isNaN(fromD)||isNaN(toD)||fromD>=toD){ btLog('Invalid date range.'); return; }
-
-  document.getElementById('btRunBtn').disabled = true;
-  btSetProgress(0);
-  const touch=parseFloat(document.getElementById('sTouch').value)||15;
-  const confirm=parseFloat(document.getElementById('sConfirm').value)||8;
-  const scanRange=parseInt(document.getElementById('sScanRange').value,10)||15;
-  const lots=parseInt(document.getElementById('sLots').value,10)||4;
-  const lotSize=parseInt(document.getElementById('sLotSize').value,10)||65;
-  const tgPct=[1,2,3,4].map(n=>parseFloat(document.getElementById('tg'+n).value)/100);
-  const slPct=parseFloat(document.getElementById('slPct').value)/100;
-  const step=50;
-
-  try{
-    await loadInstrumentTokenMap();
-
-    /* 1. Fetch NIFTY daily candles across the whole range in one call — gives us prior-day
-          closes (for ATM anchoring) and the trading-day calendar. */
-    const spotDaily = await fetchHistorical(ST.spotToken, 'day', fmtDate(fromD), fmtDate(toD), false);
-    if(spotDaily.length < 2){ btLog('Not enough daily candles in range — widen the dates.'); document.getElementById('btRunBtn').disabled=false; return; }
-
-    const nDays = spotDaily.length-1;
-    const estCalls = nDays * ((scanRange*2+1)*2 + 3);
-    btLog(`Scanning ${nDays} day(s) × ~${(scanRange*2+1)*2} strike OI calls each ≈ ${estCalls} historical calls total. This can take a few minutes — Kite's historical API is rate-limited, so calls are paced with a delay. Reduce "Strikes (± ATM)" before running for a faster pass.`);
-
-    const trades = [];
-    const equityCurve = []; // {time, equity}
-    let runningPL = 0, peak = 0, maxDD = 0;
-
-    for(let i=1;i<spotDaily.length;i++){
-      btSetProgress((i/spotDaily.length)*100);
-      const prevClose = spotDaily[i-1][4];
-      const dayDate = spotDaily[i][0].slice(0,10);
-      const dOnly = new Date(dayDate+'T00:00:00');
-      const expiry = fmtDate(nextTuesdayOnOrAfter(dOnly));
-      const atm = Math.round(prevClose/step)*step;
-
-      /* 2. Previous day's closing OI across ATM ± scanRange to compute that morning's S/R */
-      let support=atm, maxPutOI=-1, resistance=atm, maxCallOI=-1;
-      const prevDayStr = fmtDate(new Date(dOnly.getTime()-3*24*3600*1000)); // small buffer window
-      for(let n=-scanRange;n<=scanRange;n+=1){
-        const k = atm + n*step;
-        const ceTok = resolveToken(expiry,k,'CE'), peTok = resolveToken(expiry,k,'PE');
-        if(!ceTok || !peTok) continue;
-        try{
-          const [ceD, peD] = await Promise.all([
-            fetchHistorical(ceTok,'day',prevDayStr,dayDate,true),
-            fetchHistorical(peTok,'day',prevDayStr,dayDate,true)
-          ]);
-          await sleep(120);
-          if(ceD.length){ const last=ceD[ceD.length-1]; const oiv=last[6]||0; if(oiv>maxCallOI){maxCallOI=oiv; resistance=k;} }
-          if(peD.length){ const last=peD[peD.length-1]; const oiv=last[6]||0; if(oiv>maxPutOI){maxPutOI=oiv; support=k;} }
-        }catch(e){ /* strike may not have existed that far back — skip */ }
-      }
-
-      /* 3. Intraday replay: NIFTY 5-min bars for this single day */
-      let spot5;
-      try{ spot5 = await fetchHistorical(ST.spotToken,'5minute',dayDate,dayDate,false); await sleep(120); }
-      catch(e){ btLog(`${dayDate}: spot intraday fetch failed — skipping day.`); continue; }
-      if(!spot5.length) continue;
-
-      /* fetch ATM CE/PE intraday once per day (lazy — only if a signal actually needs them) */
-      let ceIntraday=null, peIntraday=null;
-      async function getCeIntraday(){ if(!ceIntraday){ const tok=resolveToken(expiry,atm,'CE'); ceIntraday = tok ? await fetchHistorical(tok,'5minute',dayDate,dayDate,false) : []; await sleep(120);} return ceIntraday; }
-      async function getPeIntraday(){ if(!peIntraday){ const tok=resolveToken(expiry,atm,'PE'); peIntraday = tok ? await fetchHistorical(tok,'5minute',dayDate,dayDate,false) : []; await sleep(120);} return peIntraday; }
-
-      let armedSupport=false, seenSupportAt=null, armedResist=false, seenResistAt=null;
-      let dayTrade = null; // one trade per day max, kept simple/conservative for the backtest
-
-      for(let b=0;b<spot5.length && !dayTrade;b++){
-        const bar = spot5[b]; const px = bar[4]; // close of 5-min bar
-        const distSup = px - support, distRes = px - resistance;
-        if(Math.abs(distSup)<=touch && !armedSupport){ armedSupport=true; seenSupportAt=px; }
-        if(Math.abs(distRes)<=touch && !armedResist){ armedResist=true; seenResistAt=px; }
-
-        if(armedSupport && (px - seenSupportAt) >= confirm){
-          const opt = await getCeIntraday();
-          const entryBar = opt.find(o=>o[0]>=bar[0]);
-          if(entryBar){ dayTrade = replayTrade('CE', support, entryBar, opt, opt.indexOf(entryBar), tgPct, slPct, lots, lotSize); }
-          armedSupport=false;
-        } else if(armedResist && (seenResistAt - px) >= confirm){
-          const opt = await getPeIntraday();
-          const entryBar = opt.find(o=>o[0]>=bar[0]);
-          if(entryBar){ dayTrade = replayTrade('PE', resistance, entryBar, opt, opt.indexOf(entryBar), tgPct, slPct, lots, lotSize); }
-          armedResist=false;
-        } else if(armedSupport && Math.abs(px-seenSupportAt)>touch*2){ armedSupport=false; }
-        else if(armedResist && Math.abs(px-seenResistAt)>touch*2){ armedResist=false; }
-      }
-
-      if(dayTrade){
-        trades.push({date:dayDate, ...dayTrade});
-        runningPL += dayTrade.pl;
-      }
-      peak = Math.max(peak, runningPL);
-      maxDD = Math.min(maxDD, runningPL-peak);
-      equityCurve.push({time: Math.floor(dOnly.getTime()/1000), value: runningPL});
-    }
-
-    renderBacktestResults(trades, equityCurve, maxDD);
-    btLog(`Backtest complete — ${trades.length} trade day(s) out of ${spotDaily.length-1} scanned.`);
-  }catch(e){
-    btLog('Backtest failed: '+e.message);
-  }finally{
-    document.getElementById('btRunBtn').disabled = false;
-    btSetProgress(100);
-  }
-}
-
-/* Replay one signal forward through that day's remaining option 5-min candles */
-function replayTrade(optType, level, entryBar, candles, startIdx, tgPct, slPct, lots, lotSize){
-  const entryPx = entryBar[4];
-  const targets = tgPct.map(p=>+(entryPx*(1+p)).toFixed(2));
-  const slPx = +(entryPx*(1-slPct)).toFixed(2);
-  let lotsRemaining = lots, pl = 0, hit=[false,false,false,false];
-  const exits = [];
-  for(let i=startIdx+1;i<candles.length && lotsRemaining>0;i++){
-    const px = candles[i][4];
-    for(let t=0;t<4;t++){
-      if(!hit[t] && px>=targets[t] && lotsRemaining>0){
-        hit[t]=true; lotsRemaining-=1;
-        const legPl=(px-entryPx)*lotSize; pl+=legPl;
-        exits.push(`T${t+1}@${px.toFixed(1)}`);
-      }
-    }
-    if(px<=slPx && lotsRemaining>0){
-      const legPl=(px-entryPx)*lotSize*lotsRemaining; pl+=legPl;
-      exits.push(`SL@${px.toFixed(1)} x${lotsRemaining}`);
-      lotsRemaining=0;
-    }
-  }
-  if(lotsRemaining>0){
-    const lastPx = candles[candles.length-1][4];
-    const legPl=(lastPx-entryPx)*lotSize*lotsRemaining; pl+=legPl;
-    exits.push(`EOD@${lastPx.toFixed(1)} x${lotsRemaining}`);
-  }
-  return {side:optType, level, entryPx, exits:exits.join(', '), pl};
-}
-
-function renderBacktestResults(trades, equityCurve, maxDD){
-  document.getElementById('btStats').style.display='grid';
-  document.getElementById('btEquityChart').style.display='block';
-  document.getElementById('btLogTable').style.display='table';
-
-  const wins = trades.filter(t=>t.pl>0).length;
-  const totalPL = trades.reduce((s,t)=>s+t.pl,0);
-  const dayPLs = trades.map(t=>t.pl);
-  document.getElementById('btDays').textContent = equityCurve.length;
-  document.getElementById('btTrades').textContent = trades.length;
-  document.getElementById('btWinRate').textContent = trades.length ? ((wins/trades.length)*100).toFixed(0)+'%' : '—';
-  const totalPLEl = document.getElementById('btTotalPL'); totalPLEl.textContent='₹'+totalPL.toFixed(0); totalPLEl.className='v '+(totalPL>=0?'bull':'bear');
-  document.getElementById('btAvgPL').textContent = trades.length ? '₹'+(totalPL/trades.length).toFixed(0) : '—';
-  document.getElementById('btMaxDD').textContent = '₹'+maxDD.toFixed(0);
-  document.getElementById('btBestDay').textContent = dayPLs.length ? '₹'+Math.max(...dayPLs).toFixed(0) : '—';
-  document.getElementById('btWorstDay').textContent = dayPLs.length ? '₹'+Math.min(...dayPLs).toFixed(0) : '—';
-
-  if(!btEquityChart){
-    const el = document.getElementById('btEquityChart');
-    btEquityChart = LightweightCharts.createChart(el, {
-      width: el.clientWidth, height:220,
-      layout:{background:{color:'#12151d'}, textColor:'#7c869e', fontFamily:'IBM Plex Mono'},
-      grid:{vertLines:{color:'#232838'}, horzLines:{color:'#232838'}},
-      timeScale:{borderColor:'#232838'}, rightPriceScale:{borderColor:'#232838'}
-    });
-    btEquityLine = btEquityChart.addLineSeries({color:'#f0a202', lineWidth:2});
-    window.addEventListener('resize', ()=>btEquityChart.applyOptions({width:el.clientWidth}));
-  }
-  btEquityLine.setData(equityCurve);
-
-  document.getElementById('btTradeBody').innerHTML = trades.map(t=>`
-    <tr>
-      <td>${t.date}</td>
-      <td>${t.side}</td>
-      <td>${t.level}</td>
-      <td>₹${t.entryPx.toFixed(2)}</td>
-      <td style="font-size:9px">${t.exits}</td>
-      <td style="color:${t.pl>=0?'var(--bull)':'var(--bear)'}">₹${t.pl.toFixed(0)}</td>
-    </tr>`).join('');
-}
-
 </script>
 </body>
 </html>
